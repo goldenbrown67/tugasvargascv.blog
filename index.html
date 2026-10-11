@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CV dan portofolio mahasiswa — ganti konten ini dengan profil kamu.">
+  <title>Nama Kamu — CV & Portofolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#080b14;--panel:#11182a;--panel2:#151f34;--text:#edf2ff;--muted:#a0acc5;--line:rgba(170,188,230,.16);--blue:#8995ff;--mint:#54e2cf;--max:1120px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}
+    body{margin:0;background:radial-gradient(ellipse at 80% 0%,rgba(93,102,230,.2),transparent 34%),radial-gradient(ellipse at 0% 40%,rgba(48,214,195,.08),transparent 28%),var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;line-height:1.7}
+    a{color:inherit;text-decoration:none}a:hover{color:var(--mint)}.wrap{width:min(var(--max),calc(100% - 40px));margin:auto}
+    .topbar{position:sticky;top:0;z-index:20;background:rgba(8,11,20,.84);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+    nav{height:74px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{font:700 1.12rem "Space Grotesk";display:flex;align-items:center;gap:10px;letter-spacing:-.04em}
+    .brand-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--mint));color:#08101b}
+    .navlinks{display:flex;gap:22px;color:var(--muted);font-size:.9rem}.navlinks a:hover{color:white}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 17px;border-radius:12px;font-weight:700;font-size:.9rem;background:linear-gradient(120deg,var(--blue),#75b9ff);color:#08101b;border:1px solid transparent;transition:transform .2s,filter .2s;cursor:pointer}
+    .btn:hover{color:#08101b;transform:translateY(-2px);filter:brightness(1.08)}.btn.secondary{background:rgba(255,255,255,.035);border-color:var(--line);color:var(--text)}
+    .hero{padding:86px 0 76px;display:grid;grid-template-columns:1.3fr .7fr;gap:54px;align-items:center;min-height:560px}
+    .eyebrow{display:inline-flex;align-items:center;gap:9px;padding:7px 12px;border:1px solid rgba(84,226,207,.25);background:rgba(84,226,207,.07);border-radius:999px;color:#8af0e0;font-size:.76rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    .dot{width:7px;height:7px;background:var(--mint);border-radius:50%;box-shadow:0 0 0 5px rgba(84,226,207,.1)}
+    h1,h2,h3{font-family:"Space Grotesk";line-height:1.13;letter-spacing:-.045em;margin-top:0}h1{font-size:clamp(2.8rem,6.2vw,5.1rem);margin:23px 0 20px}
+    .gradient{background:linear-gradient(100deg,#b4bbff 8%,#62e8d6 95%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .lead{font-size:1.12rem;color:var(--muted);max-width:650px}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}.micro{color:#7786a5;font-size:.83rem;margin-top:22px}
+    .profile{position:relative;padding:22px;border:1px solid var(--line);border-radius:26px;background:linear-gradient(145deg,rgba(24,34,57,.94),rgba(12,17,29,.96));box-shadow:0 30px 90px rgba(0,0,0,.25);overflow:hidden}
+    .profile:before{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(137,149,255,.17);filter:blur(30px);top:-100px;right:-70px}
+    .avatar{position:relative;aspect-ratio:4/4.2;border-radius:19px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(145deg,#252f51,#101827);border:1px solid rgba(255,255,255,.12)}
+    .avatar svg{width:75%;max-width:250px}.profile-info{position:relative;padding:18px 4px 3px}.profile-info h3{font-size:1.24rem;margin:0 0 5px}.profile-info p{margin:0;color:var(--muted);font-size:.9rem}.availability{display:inline-flex;align-items:center;gap:8px;color:#8de9cf;font-size:.78rem;margin-top:11px}
+    section{padding:76px 0;border-top:1px solid var(--line)}.kicker{color:var(--mint);text-transform:uppercase;letter-spacing:.15em;font-weight:700;font-size:.75rem;margin-bottom:10px}
+    h2{font-size:clamp(2rem,4vw,3.1rem);margin-bottom:12px}.intro{color:var(--muted);max-width:610px;margin:0}.section-head{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:30px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:linear-gradient(145deg,rgba(19,28,47,.9),rgba(14,20,34,.92));border:1px solid var(--line);border-radius:18px;padding:23px;transition:transform .22s,border-color .22s}.card:hover{transform:translateY(-4px);border-color:rgba(137,149,255,.5)}
+    .icon{width:43px;height:43px;border-radius:13px;display:grid;place-items:center;background:rgba(137,149,255,.12);color:#bdc4ff;font-size:1.25rem;margin-bottom:18px}.card h3{font-size:1.15rem;margin-bottom:9px}.card p{font-size:.92rem;color:var(--muted);margin:0}
+    .split{display:grid;grid-template-columns:.8fr 1.2fr;gap:55px;align-items:start}.note{padding:25px;border-radius:18px;border:1px solid rgba(84,226,207,.22);background:linear-gradient(145deg,rgba(84,226,207,.07),rgba(137,149,255,.05));margin-top:22px}.note strong{display:block;font:600 1.25rem "Space Grotesk";margin-bottom:8px}.note p{margin:0;color:var(--muted)}
+    .timeline{display:grid;gap:14px}.timeline-item{position:relative;padding:22px 24px 22px 28px;border:1px solid var(--line);border-radius:17px;background:rgba(16,22,37,.7)}.timeline-item:before{content:"";position:absolute;left:0;top:22px;bottom:22px;width:3px;border-radius:5px;background:linear-gradient(var(--blue),var(--mint))}
+    .meta{font-size:.77rem;color:var(--mint);font-weight:700;letter-spacing:.05em;text-transform:uppercase}.timeline-item h3{font-size:1.14rem;margin:7px 0}.timeline-item p{color:var(--muted);margin:0;font-size:.92rem}
+    .skill-list,.tags,.contact-links{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}.pill{padding:8px 12px;border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:999px;color:#cbd5eb;font-size:.84rem}
+    .project{padding:0;overflow:hidden}.project-art{height:160px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(137,149,255,.23),rgba(84,226,207,.09));border-bottom:1px solid var(--line);font:700 2rem "Space Grotesk";color:rgba(235,241,255,.85)}.project-body{padding:22px}.tag{font-size:.72rem;color:#aab5ff;background:rgba(137,149,255,.1);padding:5px 8px;border-radius:7px}
+    .contact-box{padding:clamp(25px,5vw,52px);border-radius:25px;border:1px solid rgba(137,149,255,.3);background:radial-gradient(ellipse at 100% 0%,rgba(137,149,255,.18),transparent 45%),linear-gradient(135deg,#121a2d,#0e1422);display:flex;align-items:center;justify-content:space-between;gap:28px}.contact-box p{color:var(--muted);max-width:600px;margin-bottom:0}.contact-link{border:1px solid var(--line);padding:9px 13px;border-radius:10px;color:#cbd5eb;font-size:.88rem}
+    footer{padding:28px 0;color:#77839e;font-size:.82rem}.footer-inner{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+    .reveal{opacity:0;transform:translateY(16px);transition:opacity .65s ease,transform .65s ease}.reveal.visible{opacity:1;transform:translateY(0)}
+    @media(max-width:850px){.hero{grid-template-columns:1fr .75fr;gap:28px;padding-top:64px}.grid{grid-template-columns:repeat(2,1fr)}.split{gap:28px}.navlinks{gap:13px}}
+    @media(max-width:650px){.wrap{width:min(100% - 30px,var(--max))}nav{height:66px}.navlinks{display:none}.hero{grid-template-columns:1fr;padding:52px 0 46px;gap:30px;min-height:0}.hero-copy{order:1}.profile{order:2;max-width:390px}.grid,.split{grid-template-columns:1fr}section{padding:56px 0}.section-head{display:block}.section-head .intro{margin-top:12px}.contact-box{display:block}.contact-box>.btn{margin-top:24px}.footer-inner{display:block}.footer-inner span{display:block;margin-top:7px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.reveal{opacity:1;transform:none;transition:none}*{transition:none!important}}
+  </style>
+</head>
+<body>
+<header class="topbar"><div class="wrap"><nav>
+  <a class="brand" href="#home"><span class="brand-icon">CV</span><span>My<span class="gradient">Space</span></span></a>
+  <div class="navlinks"><a href="#about">Tentang</a><a href="#education">Pendidikan</a><a href="#skills">Keahlian</a><a href="#projects">Proyek</a><a href="#contact">Kontak</a></div>
+  <a class="btn" href="#contact">Hubungi Saya ↗</a>
+</nav></div></header>
+<main>
+  <section class="hero wrap" id="home" style="border:0">
+    <div class="hero-copy">
+      <span class="eyebrow"><span class="dot"></span> Mahasiswa · Open to Opportunities</span>
+      <h1>Halo, saya<br><span class="gradient">Nama Kamu.</span></h1>
+      <p class="lead">Mahasiswa yang antusias mempelajari teknologi, mengembangkan ide, dan membangun solusi digital yang bermanfaat. Selamat datang di ruang profil dan portofolio saya.</p>
+      <div class="actions"><a class="btn" href="#projects">Lihat Portofolio ↗</a><a class="btn secondary" href="#about">Kenali Saya</a></div>
+      <p class="micro">📍 Indonesia &nbsp; · &nbsp; 🎓 Mahasiswa aktif</p>
+    </div>
+    <aside class="profile"><div class="avatar" aria-label="Ilustrasi profil">
+      <svg viewBox="0 0 260 290" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="130" cy="98" r="55" fill="#8995FF" fill-opacity=".22"/><path d="M48 274C51 211 83 176 130 176C177 176 209 211 212 274" fill="#54E2CF" fill-opacity=".72"/><path d="M82 89C82 58 102 38 130 38C158 38 178 58 178 89V105C178 137 157 159 130 159C103 159 82 137 82 105V89Z" fill="#E9EDFF"/><path d="M79 91C74 48 101 22 135 25C167 28 187 51 181 92L169 78C154 77 138 67 126 55C115 73 99 83 79 91Z" fill="#242E50"/><path d="M106 115C113 122 120 125 130 125C140 125 148 122 154 115" stroke="#6C7796" stroke-width="4" stroke-linecap="round"/><path d="M105 96H114M146 96H155" stroke="#242E50" stroke-width="5" stroke-linecap="round"/></svg>
+    </div><div class="profile-info"><h3>Nama Lengkap Kamu</h3><p>Mahasiswa [Program Studi]</p><span class="availability"><span class="dot"></span> Siap belajar dan berkolaborasi</span></div></aside>
+  </section>
+  <section id="about"><div class="wrap split reveal"><div><p class="kicker">01 / Tentang Saya</p><h2>Mengenal saya<br><span class="gradient">lebih dekat.</span></h2><p class="intro">Sedikit cerita tentang minat, perjalanan, dan hal yang ingin saya kembangkan.</p></div><div>
+    <p style="color:var(--muted);margin-top:0">Saya adalah mahasiswa <strong style="color:var(--text)">[Program Studi]</strong> yang tertarik pada teknologi, pemecahan masalah, dan pengembangan kemampuan secara berkelanjutan. Saya senang mempelajari hal baru, bekerja sama dalam tim, serta mengubah ide menjadi proyek yang nyata.</p>
+    <p style="color:var(--muted)">Website ini menjadi tempat untuk memperkenalkan diri, merangkum perjalanan akademik, menampilkan proyek kuliah, dan mendokumentasikan pencapaian saya.</p>
+    <div class="note"><strong>“Terus belajar, terus bertumbuh.”</strong><p>Fokus saya adalah membangun fondasi yang kuat, konsisten berlatih, dan terbuka terhadap pengalaman baru.</p></div>
+  </div></div></section>
+  <section id="education"><div class="wrap reveal"><div class="section-head"><div><p class="kicker">02 / Perjalanan</p><h2>Pendidikan & pengalaman</h2></div><p class="intro">Isi dengan riwayat pendidikan, organisasi, kepanitiaan, atau pengalaman magang yang relevan.</p></div>
+    <div class="timeline"><article class="timeline-item"><span class="meta">202X — Sekarang</span><h3>Nama Universitas · Program Studi</h3><p>Mahasiswa aktif yang mempelajari teori dan praktik di bidang studi. Tambahkan mata kuliah relevan atau pencapaian akademik.</p></article>
+    <article class="timeline-item"><span class="meta">202X — 202X</span><h3>Nama Sekolah Menengah</h3><p>Isi dengan jurusan, kegiatan, atau pencapaian yang ingin ditonjolkan.</p></article>
+    <article class="timeline-item"><span class="meta">Pengalaman / Organisasi</span><h3>Nama Organisasi atau Kegiatan</h3><p>Jelaskan peran, tanggung jawab, kontribusi, dan hasil yang dicapai. Proyek kuliah juga bisa ditampilkan.</p></article></div>
+  </div></section>
+  <section id="skills"><div class="wrap split reveal"><div><p class="kicker">03 / Kompetensi</p><h2>Keahlian yang<br><span class="gradient">terus diasah.</span></h2><p class="intro">Tampilkan keterampilan yang benar-benar kamu kuasai dan relevan dengan tujuan CV.</p></div><div>
+    <div class="card"><h3>Technical Skills</h3><p>Contoh keterampilan teknis — sesuaikan dengan kemampuanmu.</p><div class="skill-list"><span class="pill">HTML & CSS</span><span class="pill">Java</span><span class="pill">SQL / Database</span><span class="pill">Microsoft Office</span><span class="pill">UI/UX Basics</span></div></div>
+    <div class="card" style="margin-top:15px"><h3>Soft Skills</h3><p>Kemampuan bekerja dan berkomunikasi yang mendukung proses belajar serta kerja tim.</p><div class="skill-list"><span class="pill">Komunikasi</span><span class="pill">Kerja Tim</span><span class="pill">Problem Solving</span><span class="pill">Manajemen Waktu</span><span class="pill">Adaptif</span></div></div>
+  </div></div></section>
+  <section id="projects"><div class="wrap reveal"><div class="section-head"><div><p class="kicker">04 / Karya Pilihan</p><h2>Proyek & portofolio</h2></div><p class="intro">Proyek tugas kuliah juga layak ditampilkan. Ceritakan proses, peran, dan hasilnya.</p></div>
+    <div class="grid"><article class="card project"><div class="project-art">01 / WEB</div><div class="project-body"><h3>Website Profil / CV</h3><p>Ringkasan tujuan proyek, teknologi yang digunakan, dan kontribusi pribadi.</p><div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">Responsive</span></div></div></article>
+    <article class="card project"><div class="project-art">02 / DATA</div><div class="project-body"><h3>Sistem Informasi Sederhana</h3><p>Proyek basis data atau aplikasi untuk membantu pengelolaan informasi.</p><div class="tags"><span class="tag">Database</span><span class="tag">SQL</span><span class="tag">Analisis</span></div></div></article>
+    <article class="card project"><div class="project-art">03 / APP</div><div class="project-body"><h3>Aplikasi Tugas Kuliah</h3><p>Jelaskan masalah, fitur utama, dan hal yang dipelajari dari proyek tersebut.</p><div class="tags"><span class="tag">Programming</span><span class="tag">Teamwork</span></div></div></article></div>
+  </div></section>
+  <section id="certificates"><div class="wrap reveal"><div class="section-head"><div><p class="kicker">05 / Pencapaian</p><h2>Sertifikat & pencapaian</h2></div><p class="intro">Tampilkan sertifikat kursus, pelatihan, lomba, atau pencapaian akademik.</p></div>
+    <div class="grid"><article class="card"><div class="icon">✦</div><h3>Nama Sertifikat</h3><p>Penyelenggara · Tahun. Tambahkan tautan jika tersedia.</p></article><article class="card"><div class="icon">↗</div><h3>Pelatihan / Workshop</h3><p>Nama pelatihan dan keterampilan yang diperoleh.</p></article><article class="card"><div class="icon">★</div><h3>Pencapaian Akademik</h3><p>Penghargaan, lomba, atau hasil kerja yang relevan.</p></article></div>
+  </div></section>
+  <section id="contact"><div class="wrap reveal"><div class="contact-box"><div><p class="kicker">06 / Mari Terhubung</p><h2>Punya kesempatan<br><span class="gradient">untuk berkolaborasi?</span></h2><p>Saya terbuka untuk berdiskusi, belajar bersama, dan kesempatan yang relevan. Silakan hubungi saya melalui kanal berikut.</p><div class="contact-links"><a class="contact-link" href="mailto:emailkamu@example.com">✉ Email</a><a class="contact-link" href="https://www.linkedin.com/" target="_blank" rel="noopener">in LinkedIn</a><a class="contact-link" href="https://github.com/" target="_blank" rel="noopener">⌘ GitHub</a></div></div><a class="btn" href="mailto:emailkamu@example.com">Kirim Email ↗</a></div></div></section>
+</main>
+<footer><div class="wrap footer-inner"><span>© <span id="year"></span> Nama Kamu · Dibuat dengan semangat belajar.</span><span>Designed for learning, growth & opportunities.</span></div></footer>
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+  const items = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {threshold: 0.12});
+    items.forEach(item => observer.observe(item));
+  } else {
+    items.forEach(item => item.classList.add("visible"));
+  }
+</script>
+</body>
+</html>
