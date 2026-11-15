@@ -36,6 +36,7 @@
     .product:hover{transform:translateY(-4px);border-color:rgba(185,163,114,.55)}
     .art{position:relative;height:190px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(47,99,100,.5),rgba(185,163,114,.08));border-bottom:1px solid var(--line)}
     .art svg{height:140px}
+    .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
     .tag{position:absolute;top:12px;left:12px;font-size:.72rem;color:var(--gold);background:rgba(22,24,23,.7);border:1px solid rgba(185,163,114,.35);padding:3px 9px;border-radius:999px}
     .fav{position:absolute;top:8px;right:10px;font-size:1.3rem;line-height:1;background:none;border:0;color:var(--text);cursor:pointer;padding:6px}
     .fav.on{color:var(--gold)}
@@ -131,21 +132,27 @@
   /* ===== DATA PRODUK (harga & stok contoh, silakan ubah) ===== */
   const PRODUCTS = [
     {id:1,brand:'Dior',name:'Sauvage Eau de Parfum',size:'100 ml',gender:'Pria',price:2350000,stock:12,color:'#2F6364',
+     img:'foto/diorsauvage.jpg',
      notes:'Bergamot · Lada Sichuan · Ambroxan',
      desc:'Aroma segar dan maskulin dengan jejak ambery yang tahan lama. Cocok untuk dipakai harian maupun malam hari.'},
     {id:2,brand:'Chanel',name:'Bleu de Chanel Eau de Parfum',size:'100 ml',gender:'Pria',price:2650000,stock:8,color:'#113837',
+     img:'foto/chanelbleu.jpg',
      notes:'Jeruk · Cedar · Dupa',
      desc:'Woody-aromatik yang elegan dan bersih. Pilihan aman untuk acara formal maupun kantor.'},
-    {id:3,brand:'Yves Saint Laurent',name:'Libre Eau de Parfum',size:'90 ml',gender:'Wanita',price:2400000,stock:5,color:'#5a4d33',
-     notes:'Lavender · Bunga Jeruk · Vanila',
-     desc:'Perpaduan lavender yang maskulin dengan bunga jeruk yang feminin, hangat dengan sentuhan vanila.'},
-    {id:4,brand:'Creed',name:'Aventus',size:'100 ml',gender:'Pria',price:5900000,stock:3,color:'#2b2f2e',
-     notes:'Nanas · Birch · Musk',
-     desc:'Aroma fruity-smoky ikonik dengan reputasi daya tahan tinggi. Cocok untuk koleksi premium.'},
+    {id:3,brand:'Yves Saint Laurent',name:'MYSLF Eau de Parfum',size:'90 ml',gender:'Unisex',price:2400000,stock:5,color:'#5a4d33',
+     img:'foto/MYSLF.jpg',
+     notes:'Bergamot · Tunisian Orange · Ambrofix',
+     desc:'menciptakan aroma yang terasa fresh di awal, floral di tengah, lalu woody dan sensual pada dry down.'},
+    {id:4,brand:'Jean Paul Gaultier',name:'Le Beau Le Parfum for Men EDP Intense',size:'125 ml',gender:'Pria',price:5900000,stock:3,color:'#2b2f2e',
+     img:'foto/Lebeau.jpg',
+     notes:'Nanas · Kelapa · Kacang Tonka',
+     desc:'Parfum pria dengan karakter manis tropis yang hangat, creamy, dan menggoda.'},
     {id:5,brand:'Jo Malone London',name:'English Pear & Freesia Cologne',size:'100 ml',gender:'Unisex',price:2700000,stock:10,color:'#3d7173',
+     img:'foto/jomalonepear.jpg',
      notes:'Pir · Freesia · Patchouli',
      desc:'Segar, lembut, dan manis dari buah pir matang yang berpadu dengan bunga freesia. Ringan untuk sehari-hari.'},
     {id:6,brand:'Versace',name:'Eros Eau de Toilette',size:'100 ml',gender:'Pria',price:1350000,stock:0,color:'#1f4d4e',
+     img:'foto/versaceeros.jpg',
      notes:'Mint · Apel Hijau · Vanila',
      desc:'Aroma energik dan manis yang berani. Stok sedang kosong.'}
   ];
@@ -230,7 +237,7 @@
       const txt = s === 0 ? 'Habis' : s <= 5 ? 'Tersisa ' + s : 'Stok ' + s;
       const on = wish.includes(p.id);
       return '<article class="product">' +
-        '<div class="art">' + bottle(p.color) +
+        '<div class="art">' + (p.img ? '<img src="' + p.img + '" alt="' + p.brand + ' ' + p.name + '" loading="lazy">' : bottle(p.color)) +
           '<span class="tag">' + p.gender + '</span>' +
           '<button type="button" class="fav' + (on ? ' on' : '') + '" data-act="fav" data-id="' + p.id + '" aria-label="Favorit" title="Favorit">' + (on ? '♥' : '♡') + '</button>' +
         '</div>' +
@@ -317,6 +324,15 @@
   }));
   el('search').addEventListener('input', renderGrid);
   el('sort').addEventListener('change', renderGrid);
+
+  /* Jika foto gagal dimuat, tampilkan botol SVG */
+  document.addEventListener('error', e => {
+    const im = e.target;
+    if (im.tagName === 'IMG' && im.closest('.art')) {
+      const p = PRODUCTS.find(x => (x.brand + ' ' + x.name) === im.alt);
+      im.outerHTML = bottle(p ? p.color : '#2F6364');
+    }
+  }, true);
 
   el('year').textContent = new Date().getFullYear();
   renderAll();
