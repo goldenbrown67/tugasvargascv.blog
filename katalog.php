@@ -1,0 +1,384 @@
+<?php
+session_start();
+
+/* ===== DATA PRODUK (harga & stok contoh, silakan ubah) ===== */
+$products = [
+  ['id'=>1,'brand'=>'Dior','name'=>'Sauvage Eau de Parfum','size'=>'100 ml','gender'=>'Pria','price'=>2350000,'stock'=>12,'color'=>'#2F6364',
+   'notes'=>'Bergamot · Lada Sichuan · Ambroxan',
+   'desc'=>'Aroma segar dan maskulin dengan jejak ambery yang tahan lama. Cocok untuk dipakai harian maupun malam hari.'],
+  ['id'=>2,'brand'=>'Chanel','name'=>'Bleu de Chanel Eau de Parfum','size'=>'100 ml','gender'=>'Pria','price'=>2650000,'stock'=>8,'color'=>'#113837',
+   'notes'=>'Jeruk · Cedar · Dupa',
+   'desc'=>'Woody-aromatik yang elegan dan bersih. Pilihan aman untuk acara formal maupun kantor.'],
+  ['id'=>3,'brand'=>'Yves Saint Laurent','name'=>'Libre Eau de Parfum','size'=>'90 ml','gender'=>'Wanita','price'=>2400000,'stock'=>5,'color'=>'#5a4d33',
+   'notes'=>'Lavender · Bunga Jeruk · Vanila',
+   'desc'=>'Perpaduan lavender yang maskulin dengan bunga jeruk yang feminin, hangat dengan sentuhan vanila.'],
+  ['id'=>4,'brand'=>'Creed','name'=>'Aventus','size'=>'100 ml','gender'=>'Pria','price'=>5900000,'stock'=>3,'color'=>'#2b2f2e',
+   'notes'=>'Nanas · Birch · Musk',
+   'desc'=>'Aroma fruity-smoky ikonik dengan reputasi daya tahan tinggi. Cocok untuk koleksi premium.'],
+  ['id'=>5,'brand'=>'Jo Malone London','name'=>'English Pear & Freesia Cologne','size'=>'100 ml','gender'=>'Unisex','price'=>2700000,'stock'=>10,'color'=>'#3d7173',
+   'notes'=>'Pir · Freesia · Patchouli',
+   'desc'=>'Segar, lembut, dan manis dari buah pir matang yang berpadu dengan bunga freesia. Ringan untuk sehari-hari.'],
+  ['id'=>6,'brand'=>'Versace','name'=>'Eros Eau de Toilette','size'=>'100 ml','gender'=>'Pria','price'=>1350000,'stock'=>0,'color'=>'#1f4d4e',
+   'notes'=>'Mint · Apel Hijau · Vanila',
+   'desc'=>'Aroma energik dan manis yang berani. Stok sedang kosong.'],
+];
+
+/* ===== STOK DEMO: dikurangi otomatis setelah checkout (disimpan di session) ===== */
+$sold = $_SESSION['sold'] ?? [];
+foreach ($products as &$p) {
+  $p['stock'] = max(0, $p['stock'] - ($sold[$p['id']] ?? 0));
+}
+unset($p);
+
+function find_product(array $products, int $id) {
+  foreach ($products as $p) { if ($p['id'] === $id) return $p; }
+  return null;
+}
+function rupiah(int $n): string { return 'Rp ' . number_format($n, 0, ',', '.'); }
+function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
+function bottle(string $c): string {
+  return '<svg viewBox="0 0 120 160" aria-hidden="true">'
+    . '<rect x="46" y="8" width="28" height="18" rx="4" fill="#B9A372"/>'
+    . '<rect x="54" y="26" width="12" height="10" fill="#D5D9DA" opacity=".8"/>'
+    . '<rect x="22" y="36" width="76" height="112" rx="16" fill="' . $c . '"/>'
+    . '<rect x="30" y="44" width="14" height="96" rx="7" fill="#fff" opacity=".12"/>'
+    . '<rect x="44" y="76" width="44" height="34" rx="4" fill="none" stroke="#B9A372" stroke-width="1.5"/>'
+    . '<circle cx="66" cy="93" r="5" fill="#B9A372"/></svg>';
+}
+
+/* ===== PROSES TOMBOL (keranjang) ===== */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $action = $_POST['action'] ?? '';
+  $id = (int)($_POST['id'] ?? 0);
+  $back = (($_POST['back'] ?? '') === 'cart') ? '#keranjang' : '#p' . $id;
+  if (!isset($_SESSION['cart'])) $_SESSION['cart'] = [];
+  $product = find_product($products, $id);
+
+  if ($action === 'add' && $product) {
+    $qty = $_SESSION['cart'][$id] ?? 0;
+    if ($qty < $product['stock']) {
+      $_SESSION['cart'][$id] = $qty + 1;
+      $_SESSION['flash'] = $product['name'] . ' ditambahkan ke keranjang.';
+    } else {
+      $_SESSION['flash'] = 'Stok ' . $product['name'] . ' tidak mencukupi.';
+    }
+  } elseif ($action === 'dec' && isset($_SESSION['cart'][$id])) {
+    $_SESSION['cart'][$id]--;
+    if ($_SESSION['cart'][$id] <= 0) unset($_SESSION['cart'][$id]);
+  } elseif ($action === 'remove') {
+    unset($_SESSION['cart'][$id]);
+    $_SESSION['flash'] = 'Produk dihapus dari keranjang.';
+  } elseif ($action === 'clear') {
+    $_SESSION['cart'] = [];
+    $_SESSION['flash'] = 'Keranjang dikosongkan.';
+  } elseif ($action === 'checkout' && !empty($_SESSION['cart'])) {
+    $total = 0;
+    foreach ($_SESSION['cart'] as $cid => $qty) {
+      $cp = find_product($products, $cid);
+      if ($cp) {
+        $total += $cp['price'] * $qty;
+        $_SESSION['sold'][$cid] = ($_SESSION['sold'][$cid] ?? 0) + $qty;
+      }
+    }
+    $_SESSION['cart'] = [];
+    $_SESSION['flash'] = 'Pesanan diterima! Total pembayaran ' . rupiah($total) . '. Terima kasih.';
+  }
+  header('Location: katalog.php' . $back);
+  exit;
+}
+
+/* ===== DATA KERANJANG ===== */
+$cartItems = []; $cartTotal = 0; $cartCount = 0;
+foreach (($_SESSION['cart'] ?? []) as $cid => $qty) {
+  $cp = find_product($products, (int)$cid);
+  if ($cp) {
+    $cartItems[] = ['p' => $cp, 'qty' => $qty, 'sub' => $cp['price'] * $qty];
+    $cartTotal += $cp['price'] * $qty;
+    $cartCount += $qty;
+  }
+}
+$flash = $_SESSION['flash'] ?? null;
+unset($_SESSION['flash']);
+?>
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Katalog Parfum — Muhamad Vargas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#161817;--panel:#113837;--panel2:#2F6364;--gold:#B9A372;--text:#D5D9DA;--muted:rgba(213,217,218,.72);--line:rgba(213,217,218,.14);--max:1120px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}
+    body{margin:0;background:radial-gradient(ellipse at 80% 0%,rgba(47,99,100,.45),transparent 38%),radial-gradient(ellipse at 0% 40%,rgba(17,56,55,.5),transparent 32%),var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;line-height:1.7}
+    a{color:inherit;text-decoration:none}a:hover{color:var(--gold)}.wrap{width:min(var(--max),calc(100% - 40px));margin:auto}
+    .topbar{position:sticky;top:0;z-index:20;background:rgba(22,24,23,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+    nav{height:74px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{font:700 1.12rem "Space Grotesk";display:flex;align-items:center;gap:10px;letter-spacing:-.04em}
+    .brand-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:var(--gold);color:var(--bg)}
+    .navlinks{display:flex;gap:22px;color:var(--muted);font-size:.9rem;align-items:center}.navlinks a:hover{color:#fff}
+    .badge{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--gold);color:var(--bg);font-size:.75rem;font-weight:700;margin-left:6px}
+    h1,h2,h3{font-family:"Space Grotesk";line-height:1.13;letter-spacing:-.04em;margin-top:0}
+    .gradient{background:linear-gradient(100deg,#B9A372 10%,#D5D9DA 95%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .head{padding:60px 0 24px}.head h1{font-size:clamp(2.2rem,5vw,3.6rem);margin:0 0 10px}.head p{color:var(--muted);max-width:620px;margin:0}
+    .tools{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:26px 0 22px}
+    .chip,select,input[type=search]{font:inherit;font-size:.88rem;color:var(--text);background:rgba(213,217,218,.05);border:1px solid var(--line);border-radius:999px;padding:8px 15px;cursor:pointer}
+    .chip:hover,.chip.active{border-color:var(--gold);color:var(--gold)}
+    .chip:focus-visible,select:focus-visible,input:focus-visible,.btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+    input[type=search]{cursor:text;min-width:200px;flex:1 1 200px;max-width:280px}select{background:#1d2120}
+    .spacer{flex:1}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 15px;border-radius:12px;font:700 .88rem "DM Sans";background:var(--gold);color:var(--bg);border:1px solid transparent;transition:transform .2s,filter .2s;cursor:pointer}
+    .btn:hover{color:var(--bg);transform:translateY(-2px);filter:brightness(1.08)}
+    .btn.secondary{background:rgba(213,217,218,.05);border-color:var(--line);color:var(--text)}.btn.secondary:hover{color:var(--gold);border-color:rgba(185,163,114,.5)}
+    .btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;filter:none}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+    .product{display:flex;flex-direction:column;background:linear-gradient(145deg,rgba(17,56,55,.7),rgba(22,24,23,.9));border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:transform .22s,border-color .22s}
+    .product:hover{transform:translateY(-4px);border-color:rgba(185,163,114,.55)}.product[hidden]{display:none}
+    .art{position:relative;height:190px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(47,99,100,.5),rgba(185,163,114,.08));border-bottom:1px solid var(--line)}
+    .art svg{height:140px}
+    .tag{position:absolute;top:12px;left:12px;font-size:.72rem;color:var(--gold);background:rgba(22,24,23,.7);border:1px solid rgba(185,163,114,.35);padding:3px 9px;border-radius:999px}
+    .fav{position:absolute;top:8px;right:10px;font-size:1.3rem;line-height:1;background:none;border:0;color:var(--text);cursor:pointer;padding:6px}
+    .fav.on{color:var(--gold)}
+    .body{display:flex;flex-direction:column;gap:6px;padding:18px 20px 20px;flex:1}
+    .brandname{font-size:.8rem;color:var(--gold);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+    .product h3{font-size:1.1rem;margin:0}.size{color:var(--muted);font-size:.84rem}
+    .desc{color:var(--muted);font-size:.9rem;margin:4px 0 8px;flex:1}
+    .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .price{font:700 1.15rem "Space Grotesk"}.stock{font-size:.8rem;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+    .stock.low{color:var(--gold);border-color:rgba(185,163,114,.5)}.stock.out{color:#e29a8f;border-color:rgba(226,154,143,.5)}
+    .actions{display:flex;gap:8px;margin-top:12px}.actions form{flex:1;display:flex}.actions .btn{width:100%}
+    .empty{text-align:center;color:var(--muted);padding:40px 0}
+    section.cart{margin-top:70px;padding:56px 0 70px;border-top:1px solid var(--line)}
+    .cart h2{font-size:clamp(1.8rem,3.4vw,2.6rem)}
+    .cartbox{border:1px solid rgba(185,163,114,.3);border-radius:22px;padding:clamp(18px,3vw,32px);background:linear-gradient(135deg,var(--panel),var(--bg))}
+    .item{display:grid;grid-template-columns:1fr auto auto auto;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+    .item:last-of-type{border-bottom:0}.item small{color:var(--muted)}
+    .qty{display:flex;align-items:center;gap:8px}.qty form{display:inline}
+    .qty button{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:rgba(213,217,218,.05);color:var(--text);font-size:1rem;cursor:pointer}
+    .qty button:hover{border-color:var(--gold);color:var(--gold)}
+    .total{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-top:20px;padding-top:20px;border-top:1px solid var(--line)}
+    .total strong{font:700 1.5rem "Space Grotesk"}.total .btns{display:flex;gap:10px;flex-wrap:wrap}
+    .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:50;background:var(--gold);color:var(--bg);padding:12px 20px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:0 12px 40px rgba(0,0,0,.4);max-width:calc(100% - 32px);transition:opacity .4s}
+    dialog{border:1px solid rgba(185,163,114,.4);border-radius:22px;background:linear-gradient(145deg,var(--panel),var(--bg));color:var(--text);padding:0;width:min(520px,calc(100% - 32px))}
+    dialog::backdrop{background:rgba(0,0,0,.65);backdrop-filter:blur(4px)}
+    .dlg{padding:28px}.dlg h3{font-size:1.5rem;margin:4px 0 6px}.dlg .meta{color:var(--muted);font-size:.9rem}
+    .dlg .notes{margin:14px 0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(213,217,218,.04);font-size:.9rem}
+    footer{padding:28px 0;color:rgba(213,217,218,.5);font-size:.82rem;border-top:1px solid var(--line)}
+    @media(max-width:650px){.navlinks .hide{display:none}.item{grid-template-columns:1fr auto}.item .qty{grid-column:1}.item .sub{grid-column:2;text-align:right}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+  </style>
+</head>
+<body>
+<header class="topbar"><div class="wrap"><nav>
+  <a class="brand" href="index.html"><span class="brand-icon">CV</span><span>Portofolio <span class="gradient">Vargas</span></span></a>
+  <div class="navlinks">
+    <a class="hide" href="index.html">Beranda</a>
+    <a class="hide" href="index.html#about">Tentang</a>
+    <a href="katalog.php" style="color:var(--gold)">Katalog</a>
+    <a href="#keranjang">Keranjang<span class="badge"><?= $cartCount ?></span></a>
+  </div>
+</nav></div></header>
+
+<main class="wrap">
+  <div class="head">
+    <h1>Katalog <span class="gradient">Parfum Branded</span></h1>
+    <p>Koleksi parfum original pilihan lengkap dengan harga dan stok terbaru. Klik Detail untuk melihat komposisi aroma.</p>
+  </div>
+
+  <div class="tools">
+    <button type="button" class="chip active" data-filter="all">Semua</button>
+    <button type="button" class="chip" data-filter="Pria">Pria</button>
+    <button type="button" class="chip" data-filter="Wanita">Wanita</button>
+    <button type="button" class="chip" data-filter="Unisex">Unisex</button>
+    <button type="button" class="chip" data-filter="fav">♥ Favorit</button>
+    <span class="spacer"></span>
+    <input type="search" id="search" placeholder="Cari merek atau nama…" aria-label="Cari parfum">
+    <select id="sort" aria-label="Urutkan">
+      <option value="default">Urutkan: Default</option>
+      <option value="low">Harga terendah</option>
+      <option value="high">Harga tertinggi</option>
+      <option value="name">Nama A–Z</option>
+    </select>
+  </div>
+
+  <div class="grid" id="grid">
+    <?php foreach ($products as $p):
+      $stockClass = $p['stock'] === 0 ? 'out' : ($p['stock'] <= 5 ? 'low' : '');
+      $stockText  = $p['stock'] === 0 ? 'Habis' : ($p['stock'] <= 5 ? 'Tersisa ' . $p['stock'] : 'Stok ' . $p['stock']);
+    ?>
+    <article class="product" id="p<?= $p['id'] ?>"
+      data-id="<?= $p['id'] ?>"
+      data-gender="<?= e($p['gender']) ?>"
+      data-price="<?= $p['price'] ?>"
+      data-name="<?= e($p['brand'] . ' ' . $p['name']) ?>"
+      data-search="<?= e(strtolower($p['brand'] . ' ' . $p['name'])) ?>"
+      data-brand="<?= e($p['brand']) ?>"
+      data-title="<?= e($p['name']) ?>"
+      data-size="<?= e($p['size']) ?>"
+      data-desc="<?= e($p['desc']) ?>"
+      data-notes="<?= e($p['notes']) ?>"
+      data-price-fmt="<?= rupiah($p['price']) ?>"
+      data-stock="<?= $p['stock'] ?>">
+      <div class="art">
+        <?= bottle($p['color']) ?>
+        <span class="tag"><?= e($p['gender']) ?></span>
+        <button type="button" class="fav" aria-label="Tambah ke favorit" title="Favorit">♡</button>
+      </div>
+      <div class="body">
+        <span class="brandname"><?= e($p['brand']) ?></span>
+        <h3><?= e($p['name']) ?></h3>
+        <span class="size"><?= e($p['size']) ?></span>
+        <p class="desc"><?= e($p['desc']) ?></p>
+        <div class="row">
+          <span class="price"><?= rupiah($p['price']) ?></span>
+          <span class="stock <?= $stockClass ?>"><?= $stockText ?></span>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn secondary detail-btn">Detail</button>
+          <form method="post" action="katalog.php">
+            <input type="hidden" name="action" value="add">
+            <input type="hidden" name="id" value="<?= $p['id'] ?>">
+            <button class="btn" type="submit" <?= $p['stock'] === 0 ? 'disabled' : '' ?>>
+              <?= $p['stock'] === 0 ? 'Stok habis' : '+ Keranjang' ?>
+            </button>
+          </form>
+        </div>
+      </div>
+    </article>
+    <?php endforeach; ?>
+  </div>
+  <p class="empty" id="empty" hidden>Tidak ada parfum yang cocok dengan pencarian kamu.</p>
+
+  <section class="cart" id="keranjang">
+    <h2>Keranjang <span class="gradient">belanja</span></h2>
+    <div class="cartbox">
+      <?php if (empty($cartItems)): ?>
+        <p style="color:var(--muted);margin:0">Keranjang masih kosong. Pilih parfum favoritmu di atas.</p>
+      <?php else: ?>
+        <?php foreach ($cartItems as $it): $cp = $it['p']; ?>
+          <div class="item">
+            <div><strong><?= e($cp['brand'] . ' ' . $cp['name']) ?></strong><br><small><?= e($cp['size']) ?> · <?= rupiah($cp['price']) ?></small></div>
+            <div class="qty">
+              <form method="post" action="katalog.php"><input type="hidden" name="action" value="dec"><input type="hidden" name="id" value="<?= $cp['id'] ?>"><input type="hidden" name="back" value="cart"><button type="submit" aria-label="Kurangi">−</button></form>
+              <span><?= $it['qty'] ?></span>
+              <form method="post" action="katalog.php"><input type="hidden" name="action" value="add"><input type="hidden" name="id" value="<?= $cp['id'] ?>"><input type="hidden" name="back" value="cart"><button type="submit" aria-label="Tambah" <?= $it['qty'] >= $cp['stock'] ? 'disabled' : '' ?>>+</button></form>
+            </div>
+            <div class="sub"><strong><?= rupiah($it['sub']) ?></strong></div>
+            <form method="post" action="katalog.php"><input type="hidden" name="action" value="remove"><input type="hidden" name="id" value="<?= $cp['id'] ?>"><input type="hidden" name="back" value="cart"><button class="btn secondary" type="submit">Hapus</button></form>
+          </div>
+        <?php endforeach; ?>
+        <div class="total">
+          <div><small style="color:var(--muted)">Total (<?= $cartCount ?> item)</small><br><strong><?= rupiah($cartTotal) ?></strong></div>
+          <div class="btns">
+            <form method="post" action="katalog.php"><input type="hidden" name="action" value="clear"><input type="hidden" name="back" value="cart"><button class="btn secondary" type="submit">Kosongkan</button></form>
+            <form method="post" action="katalog.php"><input type="hidden" name="action" value="checkout"><input type="hidden" name="back" value="cart"><button class="btn" type="submit">Checkout ↗</button></form>
+          </div>
+        </div>
+      <?php endif; ?>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">© <?= date('Y') ?> Muhamad Vargas · <a href="index.html">← Kembali ke portofolio</a></div></footer>
+
+<dialog id="detail">
+  <div class="dlg">
+    <span class="brandname" id="d-brand"></span>
+    <h3 id="d-title"></h3>
+    <div class="meta"><span id="d-size"></span> · <span id="d-stock"></span></div>
+    <div class="notes"><strong>Aroma:</strong> <span id="d-notes"></span></div>
+    <p id="d-desc" style="color:var(--muted);margin:0 0 14px"></p>
+    <div class="row"><span class="price" id="d-price"></span></div>
+    <div class="actions">
+      <button type="button" class="btn secondary" id="d-close">Tutup</button>
+      <form method="post" action="katalog.php">
+        <input type="hidden" name="action" value="add">
+        <input type="hidden" name="id" id="d-id" value="">
+        <button class="btn" type="submit" id="d-add">+ Keranjang</button>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+<?php if ($flash): ?><div class="toast" id="toast" role="status"><?= e($flash) ?></div><?php endif; ?>
+
+<script>
+  const grid = document.getElementById('grid');
+  const cards = [...document.querySelectorAll('.product')];
+  const search = document.getElementById('search');
+  const sort = document.getElementById('sort');
+  const empty = document.getElementById('empty');
+  let filter = 'all';
+
+  /* Favorit (disimpan di browser) */
+  let wish = [];
+  try { wish = JSON.parse(localStorage.getItem('wish') || '[]'); } catch (e) {}
+  function saveWish() { try { localStorage.setItem('wish', JSON.stringify(wish)); } catch (e) {} }
+  cards.forEach(c => {
+    const btn = c.querySelector('.fav');
+    const id = c.dataset.id;
+    const paint = () => { const on = wish.includes(id); btn.classList.toggle('on', on); btn.textContent = on ? '♥' : '♡'; c.dataset.fav = on ? '1' : '0'; };
+    paint();
+    btn.addEventListener('click', () => {
+      wish = wish.includes(id) ? wish.filter(x => x !== id) : [...wish, id];
+      saveWish(); paint(); apply();
+    });
+  });
+
+  /* Filter + cari */
+  function apply() {
+    const q = search.value.toLowerCase().trim();
+    let shown = 0;
+    cards.forEach(c => {
+      const okFilter = filter === 'all' || (filter === 'fav' ? c.dataset.fav === '1' : c.dataset.gender === filter);
+      const ok = okFilter && c.dataset.search.includes(q);
+      c.hidden = !ok;
+      if (ok) shown++;
+    });
+    empty.hidden = shown > 0;
+  }
+  document.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+    ch.classList.add('active'); filter = ch.dataset.filter; apply();
+  }));
+  search.addEventListener('input', apply);
+
+  /* Urutkan */
+  sort.addEventListener('change', () => {
+    const v = sort.value;
+    [...cards].sort((a, b) =>
+      v === 'low'  ? a.dataset.price - b.dataset.price :
+      v === 'high' ? b.dataset.price - a.dataset.price :
+      v === 'name' ? a.dataset.name.localeCompare(b.dataset.name) :
+      a.dataset.id - b.dataset.id
+    ).forEach(c => grid.appendChild(c));
+  });
+
+  /* Modal detail */
+  const dlg = document.getElementById('detail');
+  cards.forEach(c => c.querySelector('.detail-btn').addEventListener('click', () => {
+    const d = c.dataset, stock = parseInt(d.stock, 10);
+    document.getElementById('d-brand').textContent = d.brand;
+    document.getElementById('d-title').textContent = d.title;
+    document.getElementById('d-size').textContent = d.size;
+    document.getElementById('d-stock').textContent = stock === 0 ? 'Stok habis' : 'Stok ' + stock;
+    document.getElementById('d-notes').textContent = d.notes;
+    document.getElementById('d-desc').textContent = d.desc;
+    document.getElementById('d-price').textContent = d.priceFmt;
+    document.getElementById('d-id').value = d.id;
+    const add = document.getElementById('d-add');
+    add.disabled = stock === 0;
+    add.textContent = stock === 0 ? 'Stok habis' : '+ Keranjang';
+    dlg.showModal();
+  }));
+  document.getElementById('d-close').addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+
+  /* Notifikasi hilang otomatis */
+  const toast = document.getElementById('toast');
+  if (toast) setTimeout(() => { toast.style.opacity = 0; setTimeout(() => toast.remove(), 400); }, 3800);
+</script>
+</body>
+</html>
